@@ -1,5 +1,7 @@
 package com.example.demo.controller;
 
+import com.example.demo.dto.LoginRequestDTO;
+import com.example.demo.dto.LoginResponseDTO;
 import com.example.demo.security.JwtUtil;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,13 +23,10 @@ public class AuthController {
     );
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody Map<String, String> body) {
-        String username = body.get("username");
-        String password = body.get("password");
-
-        if (users.containsKey(username) && users.get(username).equals(password)) {
-            String token = JwtUtil.generateToken(username, roles.get(username));
-            return ResponseEntity.ok(Map.of("token", token));
+    public ResponseEntity<?> login(@RequestBody LoginRequestDTO request) {
+        if (users.containsKey(request.username()) && users.get(request.username()).equals(request.password())) {
+            String token = JwtUtil.generateToken(request.username(), roles.get(request.username()));
+            return ResponseEntity.ok(new LoginResponseDTO(token));
         }
         return ResponseEntity.status(401).body("Usuário ou senha inválidos");
     }
